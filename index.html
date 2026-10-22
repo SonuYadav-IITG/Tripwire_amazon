@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tripwire: Alexa+ demo</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#6b6860;--line:#e3e0d8;--acc:#0b6bcb;--ok:#2f7d4f;--warn:#b7791f;--bad:#c0392b;--bub:#eaf2fc;--bar:#e9e6de;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15150f;--card:#1f1f18;--ink:#f1efe8;--mute:#a09d92;--line:#33322a;--acc:#6db1ff;--ok:#6fcf97;--warn:#f2c14e;--bad:#ff7a6b;--bub:#1d2a3a;--bar:#2b2a22;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15150f;--card:#1f1f18;--ink:#f1efe8;--mute:#a09d92;--line:#33322a;--acc:#6db1ff;--ok:#6fcf97;--warn:#f2c14e;--bad:#ff7a6b;--bub:#1d2a3a;--bar:#2b2a22;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 28px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0}h1 small{display:block;font-size:13px;font-weight:400;color:var(--mute)}
+.date{font-variant-numeric:tabular-nums;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:330px}
+.panel h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 10px}
+.bub{border-radius:14px;padding:10px 13px;margin:0 0 10px;max-width:94%;animation:in .35s ease both}
+.me{background:var(--bub)}.al{background:transparent;border:1px solid var(--line)}
+.who{font-size:11px;font-weight:700;color:var(--mute);margin-bottom:2px}
+.tool{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--acc);margin:0 0 10px}
+.spoken{font-size:17px}
+.dec{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;transition:border-color .3s,box-shadow .3s}
+.dec.revisit{border-color:var(--bad);box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 20%,transparent)}
+.dh{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-weight:600;text-transform:capitalize}
+.badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:999px;padding:2px 9px;border:1px solid currentColor}
+.active{color:var(--ok)}.revisit{color:var(--bad)}
+.ch{color:var(--mute);font-size:13px;margin:2px 0 8px}
+.tw{margin-top:8px;font-size:14px}
+.row{display:flex;justify-content:space-between;gap:8px}
+.bar{height:8px;border-radius:99px;background:var(--bar);margin-top:5px;overflow:hidden}
+.fill{height:100%;border-radius:99px;background:var(--ok);transition:width .7s ease,background .3s}
+.fill.near{background:var(--warn)}.fill.tripped{background:var(--bad)}
+.st{font-size:12px;font-weight:700;text-transform:uppercase}
+.st.armed{color:var(--ok)}.st.near{color:var(--warn)}.st.tripped,.st.pending{color:var(--bad)}
+.hood{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--mute)}
+.hood b{color:var(--ink)}
+.proof{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+@media(max-width:560px){.proof{grid-template-columns:1fr}}
+.pc{border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px}
+.pc .big{font-size:15px;margin:4px 0}.x{color:var(--bad);font-weight:700}.v{color:var(--ok);font-weight:700}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button{font:inherit;font-weight:600;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.dots{display:flex;gap:6px;margin-left:auto}.dot{width:9px;height:9px;border-radius:50%;background:var(--bar)}.dot.on{background:var(--acc)}
+.foot{margin-top:16px;font-size:12px;color:var(--mute)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🪤 Tripwire <small>A voice memory for decisions, and what would change them · Alexa+ add-on</small></h1>
+  <div class="date" id="date" aria-live="polite"></div>
+</header>
+<div id="stage"></div>
+<div class="ctl">
+  <button id="prev" aria-label="Previous step">◀ Back</button>
+  <button id="next" class="p" aria-label="Next step">Next ▶</button>
+  <button id="auto" aria-pressed="false">Autoplay</button>
+  <button id="reset">Restart</button>
+  <button id="theme" aria-label="Toggle light or dark">◐</button>
+  <div class="dots" id="dots"></div>
+</div>
+<p class="foot">Replay of <b>real output</b> from the Tripwire MCP server (offline engine, fixed demo clock: the dates are simulated, the answers are not). This page is a visualiser, not a live Alexa device. Keys: ← → step, Space autoplay.</p>
+</div>
+<script>
+const DATA={"steps": [{"date": "Oct 13", "said": "Remember: we’re going with the 200 megabit internet plan because it’s cheapest. We’d switch if the price goes above $50, or if outages hit more than twice a month. Check back in three months.", "tool": "record_decision", "args": {"what_was_said": "…"}, "spoken": "Got it. You chose the 200 megabit internet plan, because it's cheapest for our usage. I'm watching for: 1, price above $50; 2, outages more than 2 per month. I'll flag it on January 11.", "engine": "offline", "state": [{"title": "internet plan", "status": "active", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "armed", "obs": null}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Oct 13", "said": "We’re getting the grey sofa because it’s comfy. We’d return it if the price drops below $300.", "tool": "record_decision", "args": {"what_was_said": "…"}, "spoken": "Got it. You chose the grey sofa, because it's comfy. I'm watching for: 1, price below $300.", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": null}]}, {"title": "internet plan", "status": "active", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "armed", "obs": null}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Oct 27", "said": "The provider emailed: our internet price goes to $48 next month.", "tool": "report_fact", "args": {"statement": "…internet price goes to $48…"}, "spoken": "Heads up: internet plan is at 48, close to your limit of 50.", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": null}]}, {"title": "internet plan", "status": "active", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "armed", "obs": 48}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Nov 3", "said": "The provider just raised our internet price to $55.", "tool": "report_fact", "args": {"statement": "…raised our internet price to $55"}, "spoken": "That trips your internet plan decision: price above $50, and it's now 55. Want to keep it, change it, or adjust the limit?", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": null}]}, {"title": "internet plan", "status": "revisit", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "tripped", "obs": 55}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Nov 3", "said": "What should I look at?", "tool": "whats_on_watch", "args": {}, "spoken": "You're watching 2 decisions. Needs attention: internet plan, because price above $50. All quiet on grey sofa.", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": null}]}, {"title": "internet plan", "status": "revisit", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "tripped", "obs": 55}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Nov 3", "said": "Why did we pick that internet plan?", "tool": "why_did_we", "args": {"topic": "internet plan"}, "spoken": "On October 13 you chose the 200 megabit internet plan because it's cheapest for our usage. You said you'd reconsider if price above $50 and outages more than 2 per month. Since then: November 3, tripped: price above $50 (observed 55). Status: revisit.", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": null}]}, {"title": "internet plan", "status": "revisit", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $50", "op": ">", "v": 50.0, "state": "tripped", "obs": 55}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Nov 3", "said": "Keep it, but move the price limit to $60.", "tool": "resolve_decision", "args": {"outcome": "keep", "new_limit": 60, "tripwire_number": 1}, "spoken": "Kept the 200 megabit internet plan. New limit: price above $60.", "engine": "offline", "state": [{"title": "grey sofa", "status": "active", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "armed", "obs": 55}]}, {"title": "internet plan", "status": "active", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $60", "op": ">", "v": 60.0, "state": "armed", "obs": null}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}, {"date": "Nov 4", "said": "The sofa is on sale. The price dropped to $250.", "tool": "report_fact", "args": {"statement": "…sofa price dropped to $250"}, "spoken": "That trips your grey sofa decision: price below $300, and it's now 250. Want to keep it, change it, or adjust the limit?", "engine": "offline", "state": [{"title": "grey sofa", "status": "revisit", "choice": "the grey sofa", "tripwires": [{"d": "price below $300", "op": "<", "v": 300.0, "state": "tripped", "obs": 250}]}, {"title": "internet plan", "status": "active", "choice": "the 200 megabit internet plan", "tripwires": [{"d": "price above $60", "op": ">", "v": 60.0, "state": "armed", "obs": null}, {"d": "outages more than 2 per month", "op": ">", "v": 2.0, "state": "armed", "obs": null}]}]}], "proof": [{"model": "tripped", "value": 45, "server": false, "spoken": "Heads up: internet plan is at 45, close to your limit of 50."}, {"model": "not_tripped", "value": 70, "server": true, "spoken": "That trips your internet plan decision: price above $50, and it's now 70. Want to keep it, change it, or adjust the limit?"}]};
+const S=DATA.steps, P=DATA.proof, N=S.length+1;
+const $=id=>document.getElementById(id);
+const fix=s=>String(s).replace(/(\w)'(\w)/g,"$1\u2019$2").replace(/'/g,"\u2019");
+const esc=s=>fix(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+let i=0,timer=null;
+function gauge(t){
+  if(t.v==null)return `<div class="row"><span>${esc(t.d)}</span><span class="st ${t.state}">${t.state}</span></div>`;
+  let pct=0,cls="";
+  if(t.obs!=null){pct=t.op.startsWith(">")?t.obs/t.v:t.v/t.obs;pct=Math.max(0,Math.min(1,pct))*100}
+  let st=t.state; if(st==="armed"&&pct>=90){st="near";cls="near"} if(st==="tripped")cls="tripped";
+  const lim=`limit ${t.v}`+(t.obs!=null?` · latest ${t.obs}`:"");
+  return `<div class="row"><span>${esc(t.d)}</span><span class="st ${st}">${st}</span></div>
+  <div class="bar"><div class="fill ${cls}" style="width:${pct}%"></div></div><div class="ch">${lim}</div>`;
+}
+function decisions(list){
+  return list.map(d=>`<div class="dec ${d.status}"><div class="dh"><span>${esc(d.title)}</span><span class="badge ${d.status}">${d.status==="revisit"?"needs a look":d.status}</span></div>
+  <div class="ch">chose: ${esc(d.choice)}</div>${d.tripwires.map(t=>`<div class="tw">${gauge(t)}</div>`).join("")}</div>`).join("")||`<div class="ch">Nothing on watch yet.</div>`;
+}
+function render(){
+  const stage=$("stage");
+  if(i<S.length){
+    const s=S[i];$("date").textContent="📅 "+s.date+", 2026";
+    stage.innerHTML=`<div class="grid">
+    <section class="panel" aria-label="Conversation"><h2>Alexa+ conversation</h2>
+      <div class="bub me"><div class="who">YOU</div>${esc(s.said)}</div>
+      <div class="tool">→ MCP tool call: ${s.tool}</div>
+      <div class="bub al"><div class="who">ALEXA+</div><div class="spoken">${esc(s.spoken)}</div></div></section>
+    <section class="panel" aria-label="Memory"><h2>What Tripwire remembers (DynamoDB)</h2>${decisions(s.state)}</section></div>
+    <div class="hood"><b>under the hood</b> · tool <b>${s.tool}</b> · engine <b>${s.engine}</b> · numeric limits are compared by <b>server code</b>, never by the model</div>`;
+  }else{
+    $("date").textContent="🛡️ Safety proof";
+    stage.innerHTML=`<section class="panel" style="min-height:0"><h2>The model proposes. The server decides.</h2>
+    <p style="margin-top:0">We replaced the AI with a liar. Both of its answers are <b>wrong</b>. Limit: <b>price above $50</b>.</p>
+    <div class="proof">${P.map(p=>{const wrong=(p.model==="tripped")===p.server;return `<div class="pc">
+      <div class="who">MODEL SAYS</div><div class="big">“${p.model.replace("_"," ")}” for $${p.value}</div>
+      <div class="who">SERVER DECIDES</div><div class="big ${wrong?"x":"v"}">${p.server?"TRIPPED":"not tripped"} ${wrong?"✗":"✓ correct"}</div>
+      <div class="ch">${esc(p.spoken)}</div></div>`}).join("")}</div>
+    <p class="ch" style="margin-bottom:0">Pinned by automated tests that fail if the server ever trusts the model’s verdict.</p></section>`;
+  }
+  $("dots").innerHTML=Array.from({length:N},(_,k)=>`<span class="dot ${k===i?"on":""}"></span>`).join("");
+  $("prev").disabled=i===0;$("next").disabled=i===N-1;
+}
+function go(d){i=Math.max(0,Math.min(N-1,i+d));render()}
+function stop(){clearInterval(timer);timer=null;$("auto").setAttribute("aria-pressed","false");$("auto").textContent="Autoplay"}
+function toggle(){if(timer){stop();return}if(i===N-1)i=0;render();$("auto").setAttribute("aria-pressed","true");$("auto").textContent="Pause";
+  timer=setInterval(()=>{if(i>=N-1){stop();return}go(1)},5500)}
+$("prev").onclick=()=>{stop();go(-1)};$("next").onclick=()=>{stop();go(1)};$("auto").onclick=toggle;$("reset").onclick=()=>{stop();i=0;render()};
+$("theme").onclick=()=>{const r=document.documentElement,d=getComputedStyle(r).colorScheme==="dark";r.dataset.theme=d?"light":"dark"};
+addEventListener("keydown",e=>{if(e.key==="ArrowRight"){stop();go(1)}else if(e.key==="ArrowLeft"){stop();go(-1)}else if(e.key===" "){e.preventDefault();toggle()}});
+render();
+</script>
+</body>
+</html>
